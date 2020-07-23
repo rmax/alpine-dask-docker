@@ -1,4 +1,11 @@
-FROM jcrist/alpine-dask:latest
+ARG BUILD_FROM
+FROM $BUILD_FROM
+
+ARG NOTEBOOK_VERSION
+ARG JUPYTERLAB_VERSION=2.1.5
+
+ARG DASKLABEXTENSION_VERSION=2.0.2
+ARG JUPYTERLAB_MANAGER_VERSION=2.0.0
 
 # Does the following in one layer
 # - Installs jupyter notebook and jupyter lab, with dependencies
@@ -11,12 +18,14 @@ FROM jcrist/alpine-dask:latest
 # - Removes unnecessary *.js.map files
 RUN export PATH="/opt/conda/bin/:$PATH" \
     && conda install --freeze-installed -y \
-        notebook==5.7.8 \
-        jupyterlab=0.35.5 \
-        ipywidgets \
-        nodejs \
-    && pip install dask-labextension==0.3.3 --no-cache-dir --no-dependencies \
-    && jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.38.1 dask-labextension@0.3 \
+    notebook==${NOTEBOOK_VERSION} \
+    jupyterlab=${JUPYTERLAB_VERSION} \
+    ipywidgets \
+    nodejs \
+    && pip install dask-labextension==${DASKLABEXTENSION_VERSION} --no-cache-dir --no-dependencies \
+    && jupyter labextension install \
+    @jupyter-widgets/jupyterlab-manager@${JUPYTERLAB_MANAGER_VERSION} \
+    dask-labextension@${DASKLABEXTENSION_VERSION} \
     && npm cache clean --force \
     && rm -rf /opt/conda/share/jupyter/lab/staging \
     && rm -rf /home/anaconda/.cache/yarn \

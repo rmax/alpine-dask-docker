@@ -1,4 +1,9 @@
-FROM jcrist/alpine-conda:latest
+ARG BUILD_FROM
+FROM $BUILD_FROM
+
+ARG DASK_VERSION
+ARG NUMPY_VERSION=1.18.5
+ARG PANDAS_VERSION=1.0.5
 
 # Does the following in one layer
 # - Installs dask and dependencies
@@ -8,10 +13,10 @@ FROM jcrist/alpine-conda:latest
 # - Removes unnecessary *.js.map files
 # - Removes unminified bokeh js
 RUN /opt/conda/bin/conda install --freeze-installed -y \
-        dask==1.2.2 \
-        numpy==1.16.3 \
-        pandas==0.24.2 \
-        nomkl \
+    dask==${DASK_VERSION} \
+    numpy==${NUMPY_VERSION} \
+    pandas==${PANDAS_VERSION} \
+    nomkl \
     && /opt/conda/bin/conda clean -afy \
     && find /opt/conda/ -follow -type f -name '*.a' -delete \
     && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
